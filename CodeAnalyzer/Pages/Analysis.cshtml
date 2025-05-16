@@ -1,0 +1,112 @@
+@page
+@model CodeAnalyzer.Pages.AnalysisModel
+@{
+    ViewData["Title"] = "Результаты анализа";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Результаты анализа файла: @Model.FileName</h1>
+
+    <div class="row">
+        <!-- Общая информация -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Общая информация</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Язык программирования:</strong> @Model.Language</p>
+                    <p><strong>Всего строк:</strong> @Model.TotalLines</p>
+                    <p><strong>Строк кода:</strong> @Model.CodeLines</p>
+                    <p><strong>Строк комментариев:</strong> @Model.CommentLines</p>
+                    <p><strong>Пустых строк:</strong> @Model.EmptyLines</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Метрики Холстеда -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Метрики Холстеда</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Уникальные операторы:</strong> @Model.UniqueOperators</p>
+                    <p><strong>Уникальные операнды:</strong> @Model.UniqueOperands</p>
+                    <p><strong>Объем:</strong> @Model.Volume.ToString("F2")</p>
+                    <p><strong>Сложность:</strong> @Model.Difficulty.ToString("F2")</p>
+                    <p><strong>Усилия:</strong> @Model.Effort.ToString("F2")</p>
+                    <p><strong>Время:</strong> @Model.Time.ToString("F2")</p>
+                    <p><strong>Ошибки:</strong> @Model.Bugs.ToString("F2")</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Метрики МакКейба -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Метрики МакКейба</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Цикломатическая сложность:</strong> @Model.CyclomaticComplexity</p>
+                    <p><strong>Существенная сложность:</strong> @Model.EssentialComplexity</p>
+                    <p><strong>Сложность проектирования:</strong> @Model.DesignComplexity</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Метрики Джилба -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Метрики Джилба</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Индекс поддерживаемости:</strong> @Model.MaintainabilityIndex.ToString("F2")</p>
+                    <p><strong>Качество кода:</strong> @Model.CodeQuality.ToString("F2")</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Предупреждения -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Предупреждения</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Warnings.Any())
+                    {
+                        <ul class="list-group">
+                            @foreach (var warning in Model.Warnings)
+                            {
+                                <li class="list-group-item list-group-item-warning">@warning</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-success">Предупреждений не обнаружено</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="/" class="btn btn-secondary">Назад</a>
+            <button class="btn btn-primary" onclick="exportResults()">Экспорт результатов</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function exportResults() {
+            // TODO: Реализовать экспорт результатов
+            alert('Функция экспорта будет реализована позже');
+        }
+    </script>
+} 

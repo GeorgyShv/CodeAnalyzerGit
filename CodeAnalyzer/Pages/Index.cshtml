@@ -1,0 +1,89 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Code Analyzer";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12 text-center mb-4">
+            <h1 class="display-4">Code Analyzer</h1>
+            <p class="lead">Инструмент для анализа исходного кода программного обеспечения</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Загрузка кода</h5>
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Выберите файл с исходным кодом</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".cs,.cpp,.c">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Анализировать</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Поддерживаемые языки</h5>
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <h6 class="mb-1">C#</h6>
+                            <small class="text-muted">Анализ C# кода с поддержкой современных возможностей языка</small>
+                        </div>
+                        <div class="list-group-item">
+                            <h6 class="mb-1">C++</h6>
+                            <small class="text-muted">Анализ C++ кода с учетом специфики языка</small>
+                        </div>
+                        <div class="list-group-item">
+                            <h6 class="mb-1">C</h6>
+                            <small class="text-muted">Анализ C кода с поддержкой стандартных конструкций</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Метрики анализа</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Метрики Холстеда</h6>
+                            <ul class="list-unstyled">
+                                <li>Объем программы</li>
+                                <li>Сложность</li>
+                                <li>Усилия</li>
+                                <li>Время</li>
+                                <li>Оценка ошибок</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Метрики МакКейба</h6>
+                            <ul class="list-unstyled">
+                                <li>Цикломатическая сложность</li>
+                                <li>Существенная сложность</li>
+                                <li>Проектная сложность</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Метрики Джилба</h6>
+                            <ul class="list-unstyled">
+                                <li>Индекс поддерживаемости</li>
+                                <li>Качество кода</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

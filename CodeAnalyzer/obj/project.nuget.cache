@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "fmqrB3iIwj9RZiw5SglTRDufAVE5P9QiNBnVdLCBOaShzjXr3BAgXWhFOQWrZ2eiXYx/qGWrhsPt0oDPkB1jUw==",
+  "success": true,
+  "projectFilePath": "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzer\\CodeAnalyzer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\mrgos\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.19.5\\microsoft.visualstudio.azure.containers.tools.targets.1.19.5.nupkg.sha512"
+  ],
+  "logs": []
+}
