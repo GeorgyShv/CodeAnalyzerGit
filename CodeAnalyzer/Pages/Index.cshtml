@@ -9,7 +9,7 @@
         <div class="col-md-8 text-center mb-5">
             <h1 class="display-4 mb-3">Анализатор кода</h1>
             <p class="lead text-muted">
-                Анализируйте ваш код на C# с помощью современных метрик качества
+                Анализируйте ваш код на C#, C++ и Java с помощью современных метрик качества
             </p>
         </div>
     </div>
@@ -18,11 +18,11 @@
         <div class="col-md-8">
             <form method="post" enctype="multipart/form-data" class="mb-5">
                 <div class="drop-zone">
-                    <input type="file" name="UploadedFile" class="file-input" accept=".cs,.cpp,.h,.hpp" required>
+                    <input type="file" name="UploadedFile" class="file-input" accept=".cs,.cpp,.h,.hpp,.java" required>
                     <div class="drop-zone-content">
                         <i class="bi bi-cloud-upload display-4 mb-3"></i>
                         <p class="drop-zone-text">Перетащите файл сюда или нажмите для выбора</p>
-                        <p class="text-muted small">Поддерживаемые форматы: .cs, .cpp, .h, .hpp</p>
+                        <p class="text-muted small">Поддерживаемые форматы: .cs, .cpp, .h, .hpp, .java</p>
                     </div>
                 </div>
                 <div class="text-center mt-3">
@@ -42,11 +42,25 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-4">
                             <div class="language-card">
                                 <i class="bi bi-filetype-cs display-4 mb-3"></i>
                                 <h5>C#</h5>
                                 <p class="text-muted mb-0">Анализ файлов .cs</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="language-card">
+                                <i class="bi bi-filetype-cpp display-4 mb-3"></i>
+                                <h5>C++</h5>
+                                <p class="text-muted mb-0">Анализ файлов .cpp, .h, .hpp</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="language-card">
+                                <i class="bi bi-filetype-java display-4 mb-3"></i>
+                                <h5>Java</h5>
+                                <p class="text-muted mb-0">Анализ файлов .java</p>
                             </div>
                         </div>
                     </div>
@@ -131,5 +145,17 @@
 
     .drop-zone.is-invalid {
         border-color: #dc3545;
+    }
+
+    .language-card {
+        text-align: center;
+        padding: 20px;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+
+    .language-card:hover {
+        background-color: #e9ecef;
     }
 </style>

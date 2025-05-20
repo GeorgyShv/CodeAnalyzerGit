@@ -43,9 +43,9 @@ namespace CodeAnalyzer.Pages
             }
 
             var extension = Path.GetExtension(UploadedFile.FileName).ToLowerInvariant();
-            if (extension != ".cs" && extension != ".cpp" && extension != ".h" && extension != ".hpp")
+            if (extension != ".cs" && extension != ".cpp" && extension != ".h" && extension != ".hpp" && extension != ".java")
             {
-                ErrorMessage = "Поддерживаются только файлы .cs, .cpp, .h и .hpp";
+                ErrorMessage = "Поддерживаются только файлы .cs, .cpp, .h, .hpp и .java";
                 return Page();
             }
 

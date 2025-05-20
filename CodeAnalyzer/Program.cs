@@ -10,6 +10,7 @@ builder.Services.AddSession();
 // Регистрируем анализаторы
 builder.Services.AddSingleton<ICodeAnalyzer, CSharpAnalyzer>();
 builder.Services.AddSingleton<ICodeAnalyzer, CppAnalyzer>();
+builder.Services.AddSingleton<ICodeAnalyzer, JavaAnalyzer>();
 
 // Добавляем поддержку сессий
 builder.Services.AddDistributedMemoryCache();
