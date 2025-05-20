@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace CodeAnalyzer.Models
 {
     public class AnalysisResult
@@ -9,7 +12,22 @@ namespace CodeAnalyzer.Models
         public int CommentLines { get; set; }
         public int EmptyLines { get; set; }
         
-        // Метрики Холстеда
+        // Дополнительная информация
+        public long FileSize { get; set; }
+        public string AnalysisDate { get; set; } = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+
+        // Метрики в структурированном виде
+        public HalsteadMetrics HalsteadMetrics { get; set; } = new();
+        public McCabeMetrics McCabeMetrics { get; set; } = new();
+        public GilbMetrics GilbMetrics { get; set; } = new();
+        public ChepinMetrics ChepinMetrics { get; set; } = new();
+
+        // Предупреждения
+        public List<string> Warnings { get; set; } = new();
+    }
+
+    public class HalsteadMetrics
+    {
         public int UniqueOperators { get; set; }
         public int UniqueOperands { get; set; }
         public int TotalOperators { get; set; }
@@ -21,19 +39,30 @@ namespace CodeAnalyzer.Models
         public double Effort { get; set; }
         public double Time { get; set; }
         public double Bugs { get; set; }
+        public Dictionary<string, int> OperatorFrequency { get; set; } = new();
+        public Dictionary<string, int> OperandFrequency { get; set; } = new();
+    }
 
-        // Метрики МакКейба
+    public class McCabeMetrics
+    {
         public int CyclomaticComplexity { get; set; }
         public int EssentialComplexity { get; set; }
         public int DesignComplexity { get; set; }
+    }
 
-        // Метрики Джилба
+    public class GilbMetrics
+    {
         public double MaintainabilityIndex { get; set; }
         public double CodeQuality { get; set; }
+    }
 
-        // Дополнительные метрики
-        public Dictionary<string, int> OperatorFrequency { get; set; } = new();
-        public Dictionary<string, int> OperandFrequency { get; set; } = new();
-        public List<string> Warnings { get; set; } = new();
+    public class ChepinMetrics
+    {
+        public int InputVariables { get; set; }  // P
+        public int ModifiedVariables { get; set; }  // M
+        public int ControlVariables { get; set; }  // C
+        public int UnusedVariables { get; set; }  // T
+        public double Complexity { get; set; }  // Q
+        public Dictionary<string, string> VariableTypes { get; set; } = new();  // Типы переменных
     }
 } 

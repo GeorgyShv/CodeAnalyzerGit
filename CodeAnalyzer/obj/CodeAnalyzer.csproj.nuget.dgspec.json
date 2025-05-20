@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzer\\CodeAnalyzer.csproj": {}
+    "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzerGit\\CodeAnalyzer\\CodeAnalyzer.csproj": {}
   },
   "projects": {
-    "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzer\\CodeAnalyzer.csproj": {
+    "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzerGit\\CodeAnalyzer\\CodeAnalyzer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzer\\CodeAnalyzer.csproj",
+        "projectUniqueName": "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzerGit\\CodeAnalyzer\\CodeAnalyzer.csproj",
         "projectName": "CodeAnalyzer",
-        "projectPath": "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzer\\CodeAnalyzer.csproj",
+        "projectPath": "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzerGit\\CodeAnalyzer\\CodeAnalyzer.csproj",
         "packagesPath": "C:\\Users\\mrgos\\.nuget\\packages\\",
-        "outputPath": "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzer\\obj\\",
+        "outputPath": "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzerGit\\CodeAnalyzer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "D:\\Programs\\VisualStudio\\Shared\\NuGetPackages"

@@ -3,71 +3,78 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Text;
 using CodeAnalyzer.Models;
 using CodeAnalyzer.Core;
+using System.ComponentModel.DataAnnotations;
 
 namespace CodeAnalyzer.Pages
 {
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
-        private readonly ICodeAnalyzer _codeAnalyzer;
+        private readonly IEnumerable<ICodeAnalyzer> _analyzers;
 
         [BindProperty]
-        public string FileContent { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Пожалуйста, выберите файл")]
+        public IFormFile? UploadedFile { get; set; }
 
-        [BindProperty]
-        public string FileName { get; set; } = string.Empty;
+        public string? ErrorMessage { get; set; }
 
-        public IndexModel(ILogger<IndexModel> logger, ICodeAnalyzer codeAnalyzer)
+        public IndexModel(ILogger<IndexModel> logger, IEnumerable<ICodeAnalyzer> analyzers)
         {
             _logger = logger;
-            _codeAnalyzer = codeAnalyzer;
+            _analyzers = analyzers;
         }
 
         public void OnGet()
         {
         }
 
-        public async Task<IActionResult> OnPostAsync(IFormFile file)
+        public IActionResult OnPost()
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (file == null || file.Length == 0)
-                {
-                    return Page();
-                }
-
-                var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-                if (extension != ".cs")
-                {
-                    return Page();
-                }
-
-                // Чтение файла
-                using var reader = new StreamReader(file.OpenReadStream(), Encoding.UTF8);
-                FileContent = await reader.ReadToEndAsync();
-                FileName = file.FileName;
-
-                // Базовый анализ
-                var lines = FileContent.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                var result = new AnalysisResult
-                {
-                    FileName = FileName,
-                    Language = "C#",
-                    TotalLines = lines.Length,
-                    CodeLines = lines.Count(line => !string.IsNullOrWhiteSpace(line) && !line.TrimStart().StartsWith("//") && !line.TrimStart().StartsWith("/*")),
-                    CommentLines = lines.Count(line => line.TrimStart().StartsWith("//") || line.TrimStart().StartsWith("/*") || line.TrimStart().StartsWith("*")),
-                    EmptyLines = lines.Count(line => string.IsNullOrWhiteSpace(line))
-                };
-
-                // Сохраняем результат в сессию
-                HttpContext.Session.SetString("AnalysisResult", System.Text.Json.JsonSerializer.Serialize(result));
-
-                return RedirectToPage("./Analysis", new { fileName = FileName });
-            }
-            catch (Exception)
-            {
+                ErrorMessage = "Пожалуйста, выберите файл для анализа";
                 return Page();
             }
+
+            if (UploadedFile == null)
+            {
+                ErrorMessage = "Файл не был загружен";
+                return Page();
+            }
+
+            var extension = Path.GetExtension(UploadedFile.FileName).ToLowerInvariant();
+            if (extension != ".cs" && extension != ".cpp" && extension != ".h" && extension != ".hpp")
+            {
+                ErrorMessage = "Поддерживаются только файлы .cs, .cpp, .h и .hpp";
+                return Page();
+            }
+
+            // Сохраняем файл во временную директорию
+            var tempPath = Path.GetTempFileName();
+            using (var stream = System.IO.File.Create(tempPath))
+            {
+                UploadedFile.CopyTo(stream);
+            }
+
+            // Сохраняем путь к файлу в сессии
+            HttpContext.Session.SetString("AnalyzedFilePath", tempPath);
+            HttpContext.Session.SetString("OriginalFileName", UploadedFile.FileName);
+
+            return RedirectToPage("/Analysis");
+        }
+
+        public IActionResult OnPostToggleTheme()
+        {
+            var currentTheme = Request.Cookies["theme"] ?? "dark";
+            var newTheme = currentTheme == "dark" ? "light" : "dark";
+            
+            Response.Cookies.Append("theme", newTheme, new CookieOptions
+            {
+                Expires = DateTime.Now.AddYears(1),
+                IsEssential = true
+            });
+
+            return RedirectToPage();
         }
     }
 }

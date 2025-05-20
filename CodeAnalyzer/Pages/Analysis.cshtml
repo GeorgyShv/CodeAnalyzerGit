@@ -4,109 +4,192 @@
     ViewData["Title"] = "Результаты анализа";
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4">Результаты анализа файла: @Model.FileName</h1>
-
-    <div class="row">
-        <!-- Общая информация -->
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Общая информация</h5>
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="container mt-4">
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Ошибка анализа</h4>
+            <p>@Model.ErrorMessage</p>
+            <hr>
+            <p class="mb-0">Пожалуйста, вернитесь на главную страницу и попробуйте снова.</p>
+        </div>
+        <div class="text-center mt-3">
+             <a href="/" class="btn btn-primary"><i class="bi bi-arrow-left me-2"></i>Вернуться на главную</a>
+        </div>
+    </div>
+}
+else if (Model.Result != null)
+{
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Результаты анализа</h5>
+                    <a href="/" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-arrow-left me-2"></i>Назад
+                    </a>
                 </div>
                 <div class="card-body">
-                    <p><strong>Язык программирования:</strong> @Model.Language</p>
-                    <p><strong>Всего строк:</strong> @Model.TotalLines</p>
-                    <p><strong>Строк кода:</strong> @Model.CodeLines</p>
-                    <p><strong>Строк комментариев:</strong> @Model.CommentLines</p>
-                    <p><strong>Пустых строк:</strong> @Model.EmptyLines</p>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Файл</h6>
+                            <p class="mb-0">
+                                <i class="bi bi-file-earmark-code me-2"></i>
+                                @Model.Result.FileName
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Язык</h6>
+                            <p class="mb-0">
+                                <i class="bi bi-code-square me-2"></i>
+                                @Model.Result.Language
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="metric-card">
+                                <div class="metric-value">@Model.Result.TotalLines</div>
+                                <div class="metric-label">Всего строк</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-card">
+                                <div class="metric-value">@Model.Result.CodeLines</div>
+                                <div class="metric-label">Строк кода</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-card">
+                                <div class="metric-value">@Model.Result.CommentLines</div>
+                                <div class="metric-label">Комментариев</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-card">
+                                <div class="metric-value">@Model.Result.EmptyLines</div>
+                                <div class="metric-label">Пустых строк</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.Result.Warnings.Any())
+                    {
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading mb-2">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                Предупреждения
+                            </h6>
+                            <ul class="mb-0">
+                                @foreach (var warning in Model.Result.Warnings)
+                                {
+                                    <li>@warning</li>
+                                }
+                            </ul>
+                        </div>
+                    }
                 </div>
             </div>
-        </div>
 
-        <!-- Метрики Холстеда -->
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Метрики Холстеда</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Метрики Холстеда</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <h6 class="text-muted mb-2">Объем</h6>
+                                    <p class="mb-0">@Model.Result.HalsteadMetrics.Volume.ToString("F2")</p>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <h6 class="text-muted mb-2">Сложность</h6>
+                                    <p class="mb-0">@Model.Result.HalsteadMetrics.Difficulty.ToString("F2")</p>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <h6 class="text-muted mb-2">Усилия</h6>
+                                    <p class="mb-0">@Model.Result.HalsteadMetrics.Effort.ToString("F2")</p>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <h6 class="text-muted mb-2">Время</h6>
+                                    <p class="mb-0">@Model.Result.HalsteadMetrics.Time.ToString("F2")</p>
+                                </div>
+                                <div class="col-6">
+                                    <h6 class="text-muted mb-2">Ошибки</h6>
+                                    <p class="mb-0">@Model.Result.HalsteadMetrics.Bugs.ToString("F2")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p><strong>Уникальные операторы:</strong> @Model.UniqueOperators</p>
-                    <p><strong>Уникальные операнды:</strong> @Model.UniqueOperands</p>
-                    <p><strong>Объем:</strong> @Model.Volume.ToString("F2")</p>
-                    <p><strong>Сложность:</strong> @Model.Difficulty.ToString("F2")</p>
-                    <p><strong>Усилия:</strong> @Model.Effort.ToString("F2")</p>
-                    <p><strong>Время:</strong> @Model.Time.ToString("F2")</p>
-                    <p><strong>Ошибки:</strong> @Model.Bugs.ToString("F2")</p>
+
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Метрики Чепина</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <h6 class="text-muted mb-2">Входные переменные</h6>
+                                    <p class="mb-0">@Model.Result.ChepinMetrics.InputVariables</p>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <h6 class="text-muted mb-2">Модифицируемые</h6>
+                                    <p class="mb-0">@Model.Result.ChepinMetrics.ModifiedVariables</p>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <h6 class="text-muted mb-2">Управляющие</h6>
+                                    <p class="mb-0">@Model.Result.ChepinMetrics.ControlVariables</p>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <h6 class="text-muted mb-2">Неиспользуемые</h6>
+                                    <p class="mb-0">@Model.Result.ChepinMetrics.UnusedVariables</p>
+                                </div>
+                                <div class="col-12">
+                                    <h6 class="text-muted mb-2">Сложность</h6>
+                                    <p class="mb-0">@Model.Result.ChepinMetrics.Complexity.ToString("F2")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Метрики МакКейба -->
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Метрики МакКейба</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Цикломатическая сложность:</strong> @Model.CyclomaticComplexity</p>
-                    <p><strong>Существенная сложность:</strong> @Model.EssentialComplexity</p>
-                    <p><strong>Сложность проектирования:</strong> @Model.DesignComplexity</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Метрики Джилба -->
-        <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Метрики Джилба</h5>
                 </div>
                 <div class="card-body">
-                    <p><strong>Индекс поддерживаемости:</strong> @Model.MaintainabilityIndex.ToString("F2")</p>
-                    <p><strong>Качество кода:</strong> @Model.CodeQuality.ToString("F2")</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Предупреждения -->
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Предупреждения</h5>
-                </div>
-                <div class="card-body">
-                    @if (Model.Warnings.Any())
-                    {
-                        <ul class="list-group">
-                            @foreach (var warning in Model.Warnings)
-                            {
-                                <li class="list-group-item list-group-item-warning">@warning</li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <p class="text-success">Предупреждений не обнаружено</p>
-                    }
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Индекс поддерживаемости</h6>
+                            <p class="mb-0">@Model.Result.GilbMetrics.MaintainabilityIndex.ToString("F2")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Качество кода</h6>
+                            <p class="mb-0">@Model.Result.GilbMetrics.CodeQuality.ToString("F2")</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+}
 
-    <div class="row mt-4">
-        <div class="col-12">
-            <a href="/" class="btn btn-secondary">Назад</a>
-            <button class="btn btn-primary" onclick="exportResults()">Экспорт результатов</button>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        function exportResults() {
-            // TODO: Реализовать экспорт результатов
-            alert('Функция экспорта будет реализована позже');
+@functions {
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        int order = 0;
+        double size = bytes;
+        while (size >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            size /= 1024;
         }
-    </script>
+        return $"{size:0.##} {sizes[order]}";
+    }
 } 

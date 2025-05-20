@@ -1,93 +1,73 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using CodeAnalyzer.Models;
+using CodeAnalyzer.Core;
 using System.Text.Json;
 
 namespace CodeAnalyzer.Pages
 {
     public class AnalysisModel : PageModel
     {
-        [BindProperty(SupportsGet = true)]
-        public string FileName { get; set; } = string.Empty;
+        private readonly IEnumerable<ICodeAnalyzer> _analyzers;
+        private readonly ILogger<AnalysisModel> _logger;
 
-        // Общая информация
-        public string Language { get; set; } = string.Empty;
-        public int TotalLines { get; set; }
-        public int CodeLines { get; set; }
-        public int CommentLines { get; set; }
-        public int EmptyLines { get; set; }
-
-        // Метрики Холстеда
-        public int UniqueOperators { get; set; }
-        public int UniqueOperands { get; set; }
-        public double Volume { get; set; }
-        public double Difficulty { get; set; }
-        public double Effort { get; set; }
-        public double Time { get; set; }
-        public double Bugs { get; set; }
-
-        // Метрики МакКейба
-        public int CyclomaticComplexity { get; set; }
-        public int EssentialComplexity { get; set; }
-        public int DesignComplexity { get; set; }
-
-        // Метрики Джилба
-        public double MaintainabilityIndex { get; set; }
-        public double CodeQuality { get; set; }
-
-        // Предупреждения
-        public List<string> Warnings { get; set; } = new();
-
-        public IActionResult OnGet()
+        public AnalysisModel(IEnumerable<ICodeAnalyzer> analyzers, ILogger<AnalysisModel> logger)
         {
-            if (string.IsNullOrEmpty(FileName))
-            {
-                return RedirectToPage("./Index");
-            }
+            _analyzers = analyzers;
+            _logger = logger;
+        }
 
-            var analysisResultJson = HttpContext.Session.GetString("AnalysisResult");
-            if (string.IsNullOrEmpty(analysisResultJson))
-            {
-                return RedirectToPage("./Index");
-            }
+        public AnalysisResult? Result { get; private set; }
+        public string? FileName { get; private set; }
+        public string? ErrorMessage { get; private set; }
 
+        public async Task<IActionResult> OnGetAsync()
+        {
             try
             {
-                var result = JsonSerializer.Deserialize<AnalysisResult>(analysisResultJson);
-                if (result == null)
+                var filePath = HttpContext.Session.GetString("AnalyzedFilePath");
+                var originalFileName = HttpContext.Session.GetString("OriginalFileName");
+
+                if (string.IsNullOrEmpty(filePath) || string.IsNullOrEmpty(originalFileName))
                 {
-                    return RedirectToPage("./Index");
+                    ErrorMessage = "Файл не найден. Пожалуйста, загрузите файл снова.";
+                    return Page();
                 }
 
-                // Заполняем свойства модели из результата анализа
-                Language = result.Language;
-                TotalLines = result.TotalLines;
-                CodeLines = result.CodeLines;
-                CommentLines = result.CommentLines;
-                EmptyLines = result.EmptyLines;
+                FileName = originalFileName;
+                var extension = Path.GetExtension(originalFileName).ToLowerInvariant();
 
-                UniqueOperators = result.UniqueOperators;
-                UniqueOperands = result.UniqueOperands;
-                Volume = result.Volume;
-                Difficulty = result.Difficulty;
-                Effort = result.Effort;
-                Time = result.Time;
-                Bugs = result.Bugs;
+                // Выбираем подходящий анализатор
+                var analyzer = _analyzers.FirstOrDefault(a => a.GetSupportedExtensions().Contains(extension));
+                if (analyzer == null)
+                {
+                    ErrorMessage = $"Неподдерживаемый тип файла: {extension}";
+                    return Page();
+                }
 
-                CyclomaticComplexity = result.CyclomaticComplexity;
-                EssentialComplexity = result.EssentialComplexity;
-                DesignComplexity = result.DesignComplexity;
+                // Читаем содержимое файла
+                var sourceCode = await System.IO.File.ReadAllTextAsync(filePath);
 
-                MaintainabilityIndex = result.MaintainabilityIndex;
-                CodeQuality = result.CodeQuality;
+                // Анализируем код
+                Result = await analyzer.AnalyzeAsync(sourceCode, originalFileName);
 
-                Warnings = result.Warnings;
+                // Удаляем временный файл
+                try
+                {
+                    System.IO.File.Delete(filePath);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Не удалось удалить временный файл {FilePath}", filePath);
+                }
 
                 return Page();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return RedirectToPage("./Index");
+                _logger.LogError(ex, "Ошибка при анализе файла");
+                ErrorMessage = "Произошла ошибка при анализе файла. Пожалуйста, попробуйте снова.";
+                return Page();
             }
         }
     }

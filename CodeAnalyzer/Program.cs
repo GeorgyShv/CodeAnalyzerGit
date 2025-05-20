@@ -5,7 +5,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddScoped<ICodeAnalyzer, CSharpAnalyzer>();
+builder.Services.AddSession();
+
+// Регистрируем анализаторы
+builder.Services.AddSingleton<ICodeAnalyzer, CSharpAnalyzer>();
+builder.Services.AddSingleton<ICodeAnalyzer, CppAnalyzer>();
 
 // Добавляем поддержку сессий
 builder.Services.AddDistributedMemoryCache();

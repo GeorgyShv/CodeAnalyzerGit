@@ -2,13 +2,18 @@ namespace CodeAnalyzer.Core
 {
     public static class MetricsCalculator
     {
+        private const double S = 18.0; // Число Страуда
+
         public static double CalculateHalsteadVolume(int uniqueOperators, int uniqueOperands)
         {
-            return (uniqueOperators + uniqueOperands) * Math.Log2(uniqueOperators + uniqueOperands);
+            double vocabulary = uniqueOperators + uniqueOperands;
+            double length = uniqueOperators + uniqueOperands;
+            return length * Math.Log2(vocabulary);
         }
 
         public static double CalculateHalsteadDifficulty(int uniqueOperators, int uniqueOperands, int totalOperators, int totalOperands)
         {
+            if (uniqueOperands == 0) return 0;
             return (uniqueOperators * totalOperands) / (2.0 * uniqueOperands);
         }
 
@@ -19,7 +24,7 @@ namespace CodeAnalyzer.Core
 
         public static double CalculateHalsteadTime(double effort)
         {
-            return effort / 18.0;
+            return effort / S;
         }
 
         public static double CalculateHalsteadBugs(double volume)
@@ -27,21 +32,32 @@ namespace CodeAnalyzer.Core
             return volume / 3000.0;
         }
 
-        public static double CalculateMaintainabilityIndex(int cyclomaticComplexity, int linesOfCode, int commentLines)
+        public static double CalculateHalsteadLevel(double volume, double potentialVolume)
         {
+            if (volume == 0) return 0;
+            return potentialVolume / volume;
+        }
+
+        public static double CalculateChepinComplexity(int inputVars, int modifiedVars, int controlVars, int unusedVars)
+        {
+            return inputVars + 2 * modifiedVars + 3 * controlVars + 0.5 * unusedVars;
+        }
+
+        public static double CalculateGilbMaintainabilityIndex(int cyclomaticComplexity, int linesOfCode, int commentLines)
+        {
+            if (linesOfCode == 0) return 0;
+            
             double volume = Math.Log2(cyclomaticComplexity + 1);
-            double commentWeight = 100 * commentLines / linesOfCode;
+            double commentWeight = 100.0 * commentLines / linesOfCode;
             
             return 171 - 5.2 * volume - 0.23 * cyclomaticComplexity - 16.2 * Math.Log2(linesOfCode) + 50 * Math.Sin(Math.Sqrt(2.4 * commentWeight));
         }
 
-        public static double CalculateCodeQuality(double maintainabilityIndex, double cyclomaticComplexity)
+        public static double CalculateGilbCodeQuality(double maintainabilityIndex, double cyclomaticComplexity)
         {
-            // Нормализация значений
             double normalizedMaintainability = Math.Max(0, Math.Min(100, maintainabilityIndex));
             double normalizedComplexity = Math.Max(0, Math.Min(1, 1 - (cyclomaticComplexity / 50)));
 
-            // Взвешенная оценка качества кода
             return (normalizedMaintainability * 0.7 + normalizedComplexity * 30) / 100;
         }
     }

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace CodeAnalyzer.Analyzers
 {
-    public class CSharpAnalyzer : ICodeAnalyzer
+    public class CppAnalyzer : ICodeAnalyzer
     {
         private static readonly Regex SingleLineCommentRegex = new(@"^\s*//.*$");
         private static readonly Regex MultiLineCommentStartRegex = new(@"^\s*/\*.*$");
@@ -29,7 +29,7 @@ namespace CodeAnalyzer.Analyzers
                 var result = new AnalysisResult
                 {
                     FileName = fileName,
-                    Language = "C#",
+                    Language = "C++",
                     HalsteadMetrics = new HalsteadMetrics(),
                     GilbMetrics = new GilbMetrics(),
                     ChepinMetrics = new ChepinMetrics(),
@@ -104,9 +104,9 @@ namespace CodeAnalyzer.Analyzers
                 var operatorFrequency = new Dictionary<string, int>();
                 var operandFrequency = new Dictionary<string, int>();
 
-                // Регулярные выражения для поиска операторов и операндов
-                var operatorPattern = @"[+\-*/%=<>!&|^~?:]+|\.|\(|\)|\[|\]|\{|\}|,|;";
-                var operandPattern = @"\b[a-zA-Z_][a-zA-Z0-9_]*\b|\b\d+\b";
+                // Регулярные выражения для поиска операторов и операндов в C++
+                var operatorPattern = @"[+\-*/%=<>!&|^~?:]+|\.|\(|\)|\[|\]|\{|\}|,|;|::|->|\.\*|->\*|new|delete|sizeof|typeid|alignof|noexcept|decltype|co_await|co_yield|co_return";
+                var operandPattern = @"\b[a-zA-Z_][a-zA-Z0-9_]*\b|\b\d+\b|\b0[xX][0-9a-fA-F]+\b|\b0[bB][01]+\b";
 
                 // Анализ операторов
                 var operatorMatches = Regex.Matches(sourceCode, operatorPattern);
@@ -207,17 +207,17 @@ namespace CodeAnalyzer.Analyzers
         {
             var variables = new Dictionary<string, string>();
             
-            // Добавляем системные типы и using директивы
-            var systemTypes = new HashSet<string> { "System", "Console", "String", "Int32", "Double", "Boolean", "DateTime", "List", "Dictionary", "Array" };
-            var usingDirectives = new HashSet<string>();
+            // Добавляем системные типы и заголовочные файлы
+            var systemTypes = new HashSet<string> { "std", "cout", "cin", "cerr", "endl", "string", "vector", "map", "set", "list", "deque", "array", "queue", "stack", "priority_queue" };
+            var includeDirectives = new HashSet<string>();
             
-            // Находим все using директивы
-            var usingMatches = Regex.Matches(sourceCode, @"using\s+([^;]+);");
-            foreach (Match match in usingMatches)
+            // Находим все include директивы
+            var includeMatches = Regex.Matches(sourceCode, @"#include\s+[<""]([^>""]+)[>""]");
+            foreach (Match match in includeMatches)
             {
-                var usingDirective = match.Groups[1].Value.Trim();
-                usingDirectives.Add(usingDirective);
-                variables[usingDirective] = "P"; // Using директивы считаются входными переменными
+                var includeDirective = match.Groups[1].Value.Trim();
+                includeDirectives.Add(includeDirective);
+                variables[includeDirective] = "P"; // Include директивы считаются входными переменными
             }
 
             // Находим все переменные и типы
@@ -261,7 +261,8 @@ namespace CodeAnalyzer.Analyzers
                 $@"\bswitch\s*\(\s*{varName}\s*\)",
                 $@"\bforeach\s*\(\s*[^)]*{varName}[^)]*\)",
                 $@"\bcase\s+{varName}\s*:",
-                $@"\b{varName}\s*\?\s*[^:]*\s*:"
+                $@"\b{varName}\s*\?\s*[^:]*\s*:",
+                $@"\bdo\s*\{{[^}}]*\}}\s*while\s*\(\s*{varName}\s*[=<>!]"
             };
 
             return controlPatterns.Any(pattern => Regex.IsMatch(sourceCode, pattern));
@@ -271,19 +272,16 @@ namespace CodeAnalyzer.Analyzers
         {
             var inputPatterns = new[]
             {
-                $@"\b{varName}\s*=\s*Console\.Read",
-                $@"\b{varName}\s*=\s*File\.Read",
-                $@"\b{varName}\s*=\s*GetValue",
-                $@"\b{varName}\s*=\s*Parse",
-                $@"\b{varName}\s*=\s*Convert\.",
-                $@"\b{varName}\s*=\s*Environment\.",
-                $@"\b{varName}\s*=\s*Configuration\.",
-                $@"\b{varName}\s*=\s*Request\.",
-                $@"\b{varName}\s*=\s*Response\.",
-                $@"\b{varName}\s*=\s*Session\.",
-                $@"\b{varName}\s*=\s*ViewBag\.",
-                $@"\b{varName}\s*=\s*ViewData\.",
-                $@"\b{varName}\s*=\s*TempData\."
+                $@"\b{varName}\s*=\s*cin\s*>>",
+                $@"\b{varName}\s*=\s*getline\s*\(",
+                $@"\b{varName}\s*=\s*scanf\s*\(",
+                $@"\b{varName}\s*=\s*fgets\s*\(",
+                $@"\b{varName}\s*=\s*fread\s*\(",
+                $@"\b{varName}\s*=\s*read\s*\(",
+                $@"\b{varName}\s*=\s*atoi\s*\(",
+                $@"\b{varName}\s*=\s*atof\s*\(",
+                $@"\b{varName}\s*=\s*strtol\s*\(",
+                $@"\b{varName}\s*=\s*strtod\s*\("
             };
 
             return inputPatterns.Any(pattern => Regex.IsMatch(sourceCode, pattern));
@@ -309,7 +307,7 @@ namespace CodeAnalyzer.Analyzers
                 $@"\b{varName}\s*=\s*[^;]+\.",
                 $@"\b{varName}\s*=\s*new\s+",
                 $@"\b{varName}\s*=\s*\[",
-                @"\b" + varName + @"\s*=\s*\{"
+                $@"\b{varName}\s*=\s*\{{"
             };
 
             return modificationPatterns.Any(pattern => Regex.IsMatch(sourceCode, pattern));
@@ -358,7 +356,7 @@ namespace CodeAnalyzer.Analyzers
 
         public string[] GetSupportedExtensions()
         {
-            return new[] { ".cs" };
+            return new[] { ".cpp", ".hpp", ".h", ".cc", ".cxx" };
         }
     }
 } 
