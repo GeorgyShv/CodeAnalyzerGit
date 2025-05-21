@@ -8,9 +8,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddSession();
 
 // Регистрируем анализаторы
-builder.Services.AddSingleton<ICodeAnalyzer, CSharpAnalyzer>();
-builder.Services.AddSingleton<ICodeAnalyzer, CppAnalyzer>();
-builder.Services.AddSingleton<ICodeAnalyzer, JavaAnalyzer>();
+builder.Services.AddScoped<ICodeAnalyzer, CSharpAnalyzer>();
+builder.Services.AddScoped<ICodeAnalyzer, CppAnalyzer>();
+builder.Services.AddScoped<ICodeAnalyzer, JavaAnalyzer>();
 
 // Добавляем поддержку сессий
 builder.Services.AddDistributedMemoryCache();
@@ -22,6 +22,22 @@ builder.Services.AddSession(options =>
 });
 
 var app = builder.Build();
+
+// Проверяем регистрацию анализаторов
+using (var scope = app.Services.CreateScope())
+{
+    var analyzers = scope.ServiceProvider.GetServices<ICodeAnalyzer>().ToList();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    
+    if (!analyzers.Any())
+    {
+        logger.LogError("Не удалось зарегистрировать анализаторы кода");
+        throw new InvalidOperationException("Не удалось зарегистрировать анализаторы кода");
+    }
+
+    logger.LogInformation("Зарегистрированы анализаторы: {Analyzers}", 
+        string.Join(", ", analyzers.Select(a => a.GetType().Name)));
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleFiles(files) {
         if (files.length > 0) {
             const file = files[0];
-            const allowedTypes = ['.cs', '.cpp', '.h', '.hpp', '.cc', '.cxx'];
+            const allowedTypes = ['.cs', '.cpp', '.h', '.hpp', '.cc', '.cxx', '.java'];
             const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
             
             if (allowedTypes.includes(fileExtension)) {
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 analyzeButton.disabled = false;
             } else {
-                alert('Пожалуйста, выберите файл с расширением .cs, .cpp, .h, .hpp, .cc или .cxx');
+                alert('Пожалуйста, выберите файл с расширением .cs, .cpp, .h, .hpp, .cc, .cxx или .java');
             }
         }
     }

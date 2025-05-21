@@ -37,13 +37,31 @@ namespace CodeAnalyzer.Pages
                 FileName = originalFileName;
                 var extension = Path.GetExtension(originalFileName).ToLowerInvariant();
 
+                // Логируем доступные анализаторы
+                _logger.LogInformation("Доступные анализаторы: {Analyzers}", 
+                    string.Join(", ", _analyzers.Select(a => a.GetType().Name)));
+
+                // Проверяем, что у нас есть анализаторы
+                if (!_analyzers.Any())
+                {
+                    _logger.LogError("Нет доступных анализаторов");
+                    ErrorMessage = "Ошибка конфигурации: нет доступных анализаторов кода";
+                    return Page();
+                }
+
                 // Выбираем подходящий анализатор
                 var analyzer = _analyzers.FirstOrDefault(a => a.GetSupportedExtensions().Contains(extension));
                 if (analyzer == null)
                 {
-                    ErrorMessage = $"Неподдерживаемый тип файла: {extension}";
+                    _logger.LogWarning("Неподдерживаемый тип файла: {Extension}. Доступные расширения: {Extensions}", 
+                        extension,
+                        string.Join(", ", _analyzers.SelectMany(a => a.GetSupportedExtensions())));
+                    ErrorMessage = $"Неподдерживаемый тип файла: {extension}. Поддерживаемые расширения: {string.Join(", ", _analyzers.SelectMany(a => a.GetSupportedExtensions()))}";
                     return Page();
                 }
+
+                _logger.LogInformation("Выбран анализатор: {Analyzer} для файла {FileName}", 
+                    analyzer.GetType().Name, originalFileName);
 
                 // Читаем содержимое файла
                 var sourceCode = await System.IO.File.ReadAllTextAsync(filePath);
@@ -66,7 +84,7 @@ namespace CodeAnalyzer.Pages
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка при анализе файла");
-                ErrorMessage = "Произошла ошибка при анализе файла. Пожалуйста, попробуйте снова.";
+                ErrorMessage = $"Произошла ошибка при анализе файла: {ex.Message}";
                 return Page();
             }
         }
