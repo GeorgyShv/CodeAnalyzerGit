@@ -11,6 +11,7 @@ builder.Services.AddSession();
 builder.Services.AddScoped<ICodeAnalyzer, CSharpAnalyzer>();
 builder.Services.AddScoped<ICodeAnalyzer, CppAnalyzer>();
 builder.Services.AddScoped<ICodeAnalyzer, JavaAnalyzer>();
+builder.Services.AddScoped<MetricsVisualizationService>();
 
 // Добавляем поддержку сессий
 builder.Services.AddDistributedMemoryCache();

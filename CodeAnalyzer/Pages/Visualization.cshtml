@@ -1,0 +1,81 @@
+@page
+@model CodeAnalyzer.Pages.VisualizationModel
+@{
+    ViewData["Title"] = "Визуализация метрик";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Визуализация метрик анализа кода</h1>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Метрики Холстеда</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="halsteadChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Метрики Джилба</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="gilbChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Метрика Чепина</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="chepinChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Предсказание ошибок</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="errorPredictionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/charts.js"></script>
+    <script>
+        // Инициализация графиков при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Получаем данные с сервера
+            fetch('/api/metrics/halstead')
+                .then(response => response.json())
+                .then(data => createHalsteadChart('halsteadChart', data));
+
+            fetch('/api/metrics/gilb')
+                .then(response => response.json())
+                .then(data => createGilbChart('gilbChart', data));
+
+            fetch('/api/metrics/chepin')
+                .then(response => response.json())
+                .then(data => createChepinChart('chepinChart', data));
+
+            fetch('/api/metrics/error-prediction')
+                .then(response => response.json())
+                .then(data => createErrorPredictionChart('errorPredictionChart', data));
+        });
+    </script>
+} 
