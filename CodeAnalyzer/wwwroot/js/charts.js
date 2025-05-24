@@ -39,29 +39,57 @@ function createHalsteadChart(containerId, data) {
 
 function createGilbChart(containerId, data) {
     const ctx = document.getElementById(containerId).getContext('2d');
+    
+    // Нормализуем значения для лучшей визуализации
+    const maintainabilityIndex = Math.min(data.maintainabilityIndex, 100);
+    const codeQuality = Math.min(data.codeQuality, 100);
+    
     new Chart(ctx, {
-        type: 'radar',
+        type: 'bar',
         data: {
             labels: ['Индекс поддерживаемости', 'Качество кода'],
             datasets: [{
-                label: 'Метрики Джилба',
-                data: [
-                    data.maintainabilityIndex,
-                    data.codeQuality
+                label: 'Значение',
+                data: [maintainabilityIndex, codeQuality],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.5)',
+                    'rgba(54, 162, 235, 0.5)'
                 ],
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgb(255, 99, 132)',
-                pointBackgroundColor: 'rgb(255, 99, 132)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(255, 99, 132)'
+                borderColor: [
+                    'rgb(75, 192, 192)',
+                    'rgb(54, 162, 235)'
+                ],
+                borderWidth: 1
             }]
         },
         options: {
             responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += value.toFixed(2) + '%';
+                            return label;
+                        }
+                    }
+                }
+            },
             scales: {
-                r: {
-                    beginAtZero: true
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Процент'
+                    }
                 }
             }
         }
@@ -113,6 +141,12 @@ function createChepinChart(containerId, data) {
 
 function createErrorPredictionChart(containerId, data) {
     const ctx = document.getElementById(containerId).getContext('2d');
+    
+    // Создаем градиент для области под линией
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(75, 192, 192, 0.5)');
+    gradient.addColorStop(1, 'rgba(75, 192, 192, 0)');
+    
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -120,13 +154,26 @@ function createErrorPredictionChart(containerId, data) {
             datasets: [{
                 label: 'Предсказанное количество ошибок',
                 data: data.errors,
-                fill: false,
+                fill: true,
+                backgroundColor: gradient,
                 borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
         options: {
             responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            return `Ошибок: ${value.toFixed(2)}`;
+                        }
+                    }
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
