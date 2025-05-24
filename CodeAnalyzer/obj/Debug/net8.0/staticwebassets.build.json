@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Hy3qiBAkzhhikrDVsjN408G0BysxKQ1iV9FW9WkBCeQ=",
+  "Hash": "iBwbs+3WkUqroIh4Sr5eJ7MQD4weJgrzi70KPd9KcvQ=",
   "Source": "CodeAnalyzer",
   "BasePath": "_content/CodeAnalyzer",
   "Mode": "Default",
@@ -91,6 +91,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.ico"
+    },
+    {
+      "Identity": "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzerGit\\CodeAnalyzer\\wwwroot\\js\\charts.js",
+      "SourceId": "CodeAnalyzer",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzerGit\\CodeAnalyzer\\wwwroot\\",
+      "BasePath": "_content/CodeAnalyzer",
+      "RelativePath": "js/charts.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\charts.js"
     },
     {
       "Identity": "D:\\Coding\\Csharp\\DIPLOM\\CodeAnalyzerGit\\CodeAnalyzer\\wwwroot\\js\\site.js",

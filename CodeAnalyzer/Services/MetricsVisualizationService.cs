@@ -1,5 +1,6 @@
 using CodeAnalyzer.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CodeAnalyzer.Services
 {
@@ -10,8 +11,11 @@ namespace CodeAnalyzer.Services
             return new
             {
                 programLength = metrics.ProgramLength,
-                programVolume = metrics.ProgramVolume,
-                potentialVolume = metrics.PotentialVolume
+                volume = metrics.Volume,
+                difficulty = metrics.Difficulty,
+                effort = metrics.Effort,
+                time = metrics.Time,
+                bugs = metrics.Bugs
             };
         }
 
@@ -19,10 +23,8 @@ namespace CodeAnalyzer.Services
         {
             return new
             {
-                absoluteComplexity = metrics.AbsoluteComplexity,
-                relativeComplexity = metrics.RelativeComplexity,
-                moduleCount = metrics.ModuleCount,
-                moduleConnections = metrics.ModuleConnections
+                maintainabilityIndex = metrics.MaintainabilityIndex,
+                codeQuality = metrics.CodeQuality
             };
         }
 
@@ -33,7 +35,8 @@ namespace CodeAnalyzer.Services
                 inputVariables = metrics.InputVariables,
                 modifiedVariables = metrics.ModifiedVariables,
                 controlVariables = metrics.ControlVariables,
-                parasiticVariables = metrics.ParasiticVariables
+                unusedVariables = metrics.UnusedVariables,
+                complexity = metrics.Complexity
             };
         }
 
@@ -41,8 +44,8 @@ namespace CodeAnalyzer.Services
         {
             return new
             {
-                volumes = results.Select(r => r.HalsteadMetrics.ProgramVolume).ToList(),
-                errors = results.Select(r => r.HalsteadMetrics.EstimatedErrors).ToList()
+                volumes = results.Select(r => r.HalsteadMetrics.Volume).ToList(),
+                errors = results.Select(r => r.HalsteadMetrics.Bugs).ToList()
             };
         }
     }

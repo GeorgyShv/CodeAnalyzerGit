@@ -1,17 +1,12 @@
 using CodeAnalyzer.Core;
 using CodeAnalyzer.Analyzers;
+using CodeAnalyzer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddSession();
-
-// Регистрируем анализаторы
-builder.Services.AddScoped<ICodeAnalyzer, CSharpAnalyzer>();
-builder.Services.AddScoped<ICodeAnalyzer, CppAnalyzer>();
-builder.Services.AddScoped<ICodeAnalyzer, JavaAnalyzer>();
-builder.Services.AddScoped<MetricsVisualizationService>();
+builder.Services.AddControllers();
 
 // Добавляем поддержку сессий
 builder.Services.AddDistributedMemoryCache();
@@ -21,6 +16,12 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+// Регистрируем анализаторы
+builder.Services.AddScoped<ICodeAnalyzer, CSharpAnalyzer>();
+builder.Services.AddScoped<ICodeAnalyzer, CppAnalyzer>();
+builder.Services.AddScoped<ICodeAnalyzer, JavaAnalyzer>();
+builder.Services.AddScoped<MetricsVisualizationService>();
 
 var app = builder.Build();
 
@@ -59,5 +60,6 @@ app.UseAuthorization();
 app.UseSession();
 
 app.MapRazorPages();
+app.MapControllers();
 
 app.Run();

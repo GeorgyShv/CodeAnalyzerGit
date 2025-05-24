@@ -360,5 +360,50 @@ namespace CodeAnalyzer.Analyzers
         {
             return new[] { ".cs" };
         }
+
+        public HalsteadMetrics GetHalsteadMetrics()
+        {
+            return new HalsteadMetrics
+            {
+                UniqueOperators = 0,
+                UniqueOperands = 0,
+                TotalOperators = 0,
+                TotalOperands = 0,
+                Volume = 0,
+                Difficulty = 0,
+                Effort = 0,
+                Time = 0,
+                Bugs = 0,
+                OperatorFrequency = new Dictionary<string, int>(),
+                OperandFrequency = new Dictionary<string, int>()
+            };
+        }
+
+        public GilbMetrics GetGilbMetrics()
+        {
+            return new GilbMetrics
+            {
+                MaintainabilityIndex = 0,
+                CodeQuality = 0
+            };
+        }
+
+        public ChepinMetrics GetChepinMetrics()
+        {
+            return new ChepinMetrics
+            {
+                InputVariables = 0,
+                ModifiedVariables = 0,
+                ControlVariables = 0,
+                UnusedVariables = 0,
+                Complexity = 0,
+                VariableTypes = new Dictionary<string, string>()
+            };
+        }
+
+        public List<AnalysisResult> GetAnalysisResults()
+        {
+            return new List<AnalysisResult>();
+        }
     }
 } 

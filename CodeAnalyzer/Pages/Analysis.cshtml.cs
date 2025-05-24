@@ -25,6 +25,15 @@ namespace CodeAnalyzer.Pages
         {
             try
             {
+                // Проверяем, есть ли уже результаты анализа в сессии
+                var resultJson = HttpContext.Session.GetString("AnalysisResult");
+                if (!string.IsNullOrEmpty(resultJson))
+                {
+                    Result = JsonSerializer.Deserialize<AnalysisResult>(resultJson);
+                    FileName = HttpContext.Session.GetString("OriginalFileName");
+                    return Page();
+                }
+
                 var filePath = HttpContext.Session.GetString("AnalyzedFilePath");
                 var originalFileName = HttpContext.Session.GetString("OriginalFileName");
 
@@ -68,6 +77,11 @@ namespace CodeAnalyzer.Pages
 
                 // Анализируем код
                 Result = await analyzer.AnalyzeAsync(sourceCode, originalFileName);
+
+                // Сохраняем результаты в сессии
+                resultJson = JsonSerializer.Serialize(Result);
+                _logger.LogInformation("Сохранение результатов анализа в сессию: {ResultJson}", resultJson);
+                HttpContext.Session.SetString("AnalysisResult", resultJson);
 
                 // Удаляем временный файл
                 try

@@ -5,19 +5,23 @@ function createHalsteadChart(containerId, data) {
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Длина программы (N)', 'Объем программы (V)', 'Потенциальный объем (V*)'],
+            labels: ['Объем программы', 'Сложность', 'Усилия', 'Время', 'Ошибки'],
             datasets: [{
                 label: 'Метрики Холстеда',
-                data: [data.programLength, data.programVolume, data.potentialVolume],
+                data: [data.volume, data.difficulty, data.effort, data.time, data.bugs],
                 backgroundColor: [
                     'rgba(54, 162, 235, 0.5)',
                     'rgba(255, 99, 132, 0.5)',
-                    'rgba(75, 192, 192, 0.5)'
+                    'rgba(75, 192, 192, 0.5)',
+                    'rgba(255, 206, 86, 0.5)',
+                    'rgba(153, 102, 255, 0.5)'
                 ],
                 borderColor: [
                     'rgb(54, 162, 235)',
                     'rgb(255, 99, 132)',
-                    'rgb(75, 192, 192)'
+                    'rgb(75, 192, 192)',
+                    'rgb(255, 206, 86)',
+                    'rgb(153, 102, 255)'
                 ],
                 borderWidth: 1
             }]
@@ -38,14 +42,12 @@ function createGilbChart(containerId, data) {
     new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: ['Абсолютная сложность', 'Относительная сложность', 'Количество модулей', 'Связи между модулями'],
+            labels: ['Индекс поддерживаемости', 'Качество кода'],
             datasets: [{
                 label: 'Метрики Джилба',
                 data: [
-                    data.absoluteComplexity,
-                    data.relativeComplexity,
-                    data.moduleCount,
-                    data.moduleConnections
+                    data.maintainabilityIndex,
+                    data.codeQuality
                 ],
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 borderColor: 'rgb(255, 99, 132)',
@@ -71,13 +73,13 @@ function createChepinChart(containerId, data) {
     new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: ['Вводимые (P)', 'Модифицируемые (M)', 'Управляющие (C)', 'Паразитные (T)'],
+            labels: ['Вводимые (P)', 'Модифицируемые (M)', 'Управляющие (C)', 'Неиспользуемые (U)'],
             datasets: [{
                 data: [
                     data.inputVariables,
                     data.modifiedVariables,
                     data.controlVariables,
-                    data.parasiticVariables
+                    data.unusedVariables
                 ],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.5)',

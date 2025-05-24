@@ -17,5 +17,25 @@ namespace CodeAnalyzer.Core
         /// </summary>
         /// <returns>Массив поддерживаемых расширений файлов (например, [".cs", ".cpp", ".c"])</returns>
         string[] GetSupportedExtensions();
+
+        /// <summary>
+        /// Получает метрики Холстеда
+        /// </summary>
+        HalsteadMetrics GetHalsteadMetrics();
+
+        /// <summary>
+        /// Получает метрики Джилба
+        /// </summary>
+        GilbMetrics GetGilbMetrics();
+
+        /// <summary>
+        /// Получает метрики Чепина
+        /// </summary>
+        ChepinMetrics GetChepinMetrics();
+
+        /// <summary>
+        /// Получает результаты анализа
+        /// </summary>
+        List<AnalysisResult> GetAnalysisResults();
     }
 } 
