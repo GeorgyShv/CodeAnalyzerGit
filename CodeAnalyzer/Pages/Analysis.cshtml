@@ -21,7 +21,23 @@
 else if (Model.Result != null)
 {
     <div class="row justify-content-center">
-        <div class="col-md-10">
+        <div class="col-12">
+            @if (!string.IsNullOrEmpty(Model.SourceCode))
+            {
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Исходный код</h5>
+                        <button class="btn btn-primary btn-sm" onclick="toggleSourceCode()">
+                            <i class="bi bi-code-square me-2"></i>
+                            <span id="toggleButtonText">Показать код</span>
+                        </button>
+                    </div>
+                    <div class="card-body" id="sourceCodeContainer" style="display: none;">
+                        <pre class="bg-light p-3 rounded"><code class="language-csharp">@Model.SourceCode</code></pre>
+                    </div>
+                </div>
+            }
+            
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Результаты анализа</h5>
@@ -184,19 +200,21 @@ else if (Model.Result != null)
     </div>
 }
 
-@functions {
-    private string FormatFileSize(long bytes)
-    {
-        string[] sizes = { "B", "KB", "MB", "GB" };
-        int order = 0;
-        double size = bytes;
-        while (size >= 1024 && order < sizes.Length - 1)
-        {
-            order++;
-            size /= 1024;
+@section Scripts {
+    <script>
+        function toggleSourceCode() {
+            const container = document.getElementById('sourceCodeContainer');
+            const buttonText = document.getElementById('toggleButtonText');
+            
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                buttonText.textContent = 'Скрыть код';
+            } else {
+                container.style.display = 'none';
+                buttonText.textContent = 'Показать код';
+            }
         }
-        return $"{size:0.##} {sizes[order]}";
-    }
+    </script>
 }
 
 <input type="file" id="fileInput" class="form-control d-none" accept=".cs, .cpp, .h, .hpp, .cc, .cxx, .java"> 

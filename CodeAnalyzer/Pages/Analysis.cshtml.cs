@@ -20,6 +20,7 @@ namespace CodeAnalyzer.Pages
         public AnalysisResult? Result { get; private set; }
         public string? FileName { get; private set; }
         public string? ErrorMessage { get; private set; }
+        public string? SourceCode { get; private set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -31,11 +32,13 @@ namespace CodeAnalyzer.Pages
                 {
                     Result = JsonSerializer.Deserialize<AnalysisResult>(resultJson);
                     FileName = HttpContext.Session.GetString("OriginalFileName");
+                    SourceCode = HttpContext.Session.GetString("SourceCode");
                     return Page();
                 }
 
                 var filePath = HttpContext.Session.GetString("AnalyzedFilePath");
                 var originalFileName = HttpContext.Session.GetString("OriginalFileName");
+                SourceCode = HttpContext.Session.GetString("SourceCode");
 
                 if (string.IsNullOrEmpty(filePath) || string.IsNullOrEmpty(originalFileName))
                 {

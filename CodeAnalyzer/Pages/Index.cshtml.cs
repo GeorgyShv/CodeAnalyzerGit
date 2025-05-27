@@ -30,6 +30,7 @@ namespace CodeAnalyzer.Pages
             HttpContext.Session.Remove("AnalysisResult");
             HttpContext.Session.Remove("AnalyzedFilePath");
             HttpContext.Session.Remove("OriginalFileName");
+            HttpContext.Session.Remove("SourceCode");
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -58,9 +59,17 @@ namespace CodeAnalyzer.Pages
                 await UploadedFile.CopyToAsync(stream);
             }
 
-            // Сохраняем путь к файлу в сессии
+            // Читаем содержимое файла
+            string sourceCode;
+            using (var reader = new StreamReader(UploadedFile.OpenReadStream()))
+            {
+                sourceCode = await reader.ReadToEndAsync();
+            }
+
+            // Сохраняем путь к файлу и код в сессии
             HttpContext.Session.SetString("AnalyzedFilePath", tempPath);
             HttpContext.Session.SetString("OriginalFileName", UploadedFile.FileName);
+            HttpContext.Session.SetString("SourceCode", sourceCode);
 
             return RedirectToPage("/Analysis");
         }
