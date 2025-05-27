@@ -13,7 +13,7 @@ namespace CodeAnalyzer.Pages
         private readonly IEnumerable<ICodeAnalyzer> _analyzers;
 
         [BindProperty]
-        [Required(ErrorMessage = "Пожалуйста, выберите файл")]
+        [Required(ErrorMessage = "Пожалуйста, выберите файл для анализа")]
         public IFormFile? UploadedFile { get; set; }
 
         public string? ErrorMessage { get; set; }
@@ -26,34 +26,36 @@ namespace CodeAnalyzer.Pages
 
         public void OnGet()
         {
+            // Очищаем результаты предыдущего анализа при загрузке главной страницы
+            HttpContext.Session.Remove("AnalysisResult");
+            HttpContext.Session.Remove("AnalyzedFilePath");
+            HttpContext.Session.Remove("OriginalFileName");
         }
 
-        public IActionResult OnPost()
+        public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
-                ErrorMessage = "Пожалуйста, выберите файл для анализа";
                 return Page();
             }
 
             if (UploadedFile == null)
             {
-                ErrorMessage = "Файл не был загружен";
+                ModelState.AddModelError("UploadedFile", "Пожалуйста, выберите файл для анализа");
                 return Page();
             }
 
-            var extension = Path.GetExtension(UploadedFile.FileName).ToLowerInvariant();
-            if (extension != ".cs" && extension != ".cpp" && extension != ".h" && extension != ".hpp" && extension != ".java")
-            {
-                ErrorMessage = "Поддерживаются только файлы .cs, .cpp, .h, .hpp и .java";
-                return Page();
-            }
+            // Создаем временную директорию, если она не существует
+            var tempDir = Path.Combine(Path.GetTempPath(), "CodeAnalyzer");
+            Directory.CreateDirectory(tempDir);
 
-            // Сохраняем файл во временную директорию
-            var tempPath = Path.GetTempFileName();
-            using (var stream = System.IO.File.Create(tempPath))
+            // Генерируем уникальное имя файла
+            var tempPath = Path.Combine(tempDir, $"{Guid.NewGuid()}{Path.GetExtension(UploadedFile.FileName)}");
+
+            // Сохраняем файл
+            using (var stream = new FileStream(tempPath, FileMode.Create))
             {
-                UploadedFile.CopyTo(stream);
+                await UploadedFile.CopyToAsync(stream);
             }
 
             // Сохраняем путь к файлу в сессии
