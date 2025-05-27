@@ -8,6 +8,7 @@ namespace CodeAnalyzer.Core
         {
             double vocabulary = uniqueOperators + uniqueOperands;
             double length = uniqueOperators + uniqueOperands;
+            if (vocabulary == 0) return 0;
             return length * Math.Log2(vocabulary);
         }
 
@@ -32,10 +33,28 @@ namespace CodeAnalyzer.Core
             return volume / 3000.0;
         }
 
+        public static double CalculateHalsteadPotentialVolume(int numberOfInputOutputParameters)
+        {
+            double n2Star = numberOfInputOutputParameters;
+            if (n2Star + 2 <= 0) return 0;
+            return (n2Star + 2) * Math.Log2(n2Star + 2);
+        }
+
         public static double CalculateHalsteadLevel(double volume, double potentialVolume)
         {
             if (volume == 0) return 0;
             return potentialVolume / volume;
+        }
+
+        public static double CalculateHalsteadLanguageLevel(double programLevel, double potentialVolume)
+        {
+            return programLevel * potentialVolume;
+        }
+
+        public static double CalculateHalsteadProgrammingEffort(double volume, double programLevel)
+        {
+            if (programLevel == 0) return 0;
+            return volume / programLevel;
         }
 
         public static double CalculateChepinComplexity(int inputVars, int modifiedVars, int controlVars, int unusedVars)
