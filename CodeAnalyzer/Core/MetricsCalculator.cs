@@ -79,5 +79,19 @@ namespace CodeAnalyzer.Core
 
             return (normalizedMaintainability * 0.7 + normalizedComplexity * 30) / 100;
         }
+
+        // Новые метрики сложности из примера
+        public static int CalculateAbsoluteComplexityCL(int numberOfConditionalOperators)
+        {
+            // CL = количество операторов условия
+            return numberOfConditionalOperators;
+        }
+
+        public static double CalculateRelativeComplexityCL(int absoluteComplexityCL, double totalOperators)
+        {
+            // cl = CL / L (где L - общее число используемых операторов)
+            if (totalOperators == 0) return 0; // Избегаем деления на ноль
+            return (double)absoluteComplexityCL / totalOperators;
+        }
     }
 } 

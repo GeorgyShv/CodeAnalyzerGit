@@ -137,6 +137,8 @@ namespace CodeAnalyzer.Analyzers
                 result.HalsteadMetrics.TotalOperands = operandFrequency.Values.Sum();
                 result.HalsteadMetrics.OperatorFrequency = operatorFrequency;
                 result.HalsteadMetrics.OperandFrequency = operandFrequency;
+                result.HalsteadMetrics.ProgramLength = (double)(result.HalsteadMetrics.TotalOperators + result.HalsteadMetrics.TotalOperands); // Расчет длины программы (N)
+                result.HalsteadMetrics.Vocabulary = result.HalsteadMetrics.UniqueOperators + result.HalsteadMetrics.UniqueOperands; // Расчет словаря (n)
 
                 // Определение числа входных/выходных параметров (n2*)
                 result.NumberOfInputOutputParameters = AnalyzeInputOutputParameters(sourceCode);
@@ -173,6 +175,14 @@ namespace CodeAnalyzer.Analyzers
                 result.HalsteadMetrics.LanguageLevel = MetricsCalculator.CalculateHalsteadLanguageLevel(result.HalsteadMetrics.ProgramLevel, result.HalsteadMetrics.PotentialVolume);
                 result.HalsteadMetrics.ProgrammingEffort = MetricsCalculator.CalculateHalsteadProgrammingEffort(result.HalsteadMetrics.Volume, result.HalsteadMetrics.ProgramLevel);
 
+                // Расчет метрик сложности из примера (CL, cl)
+                var numberOfConditionalOperators = CountConditionalOperators(sourceCode);
+                result.AbsoluteComplexityCL = MetricsCalculator.CalculateAbsoluteComplexityCL(numberOfConditionalOperators);
+                result.RelativeComplexityCL = MetricsCalculator.CalculateRelativeComplexityCL(
+                    result.AbsoluteComplexityCL,
+                    result.HalsteadMetrics.ProgramLength // Общее число операторов и операндов (N1 + N2)
+                );
+
                 // Анализ переменных для метрики Чепина
                 var variables = AnalyzeVariables(sourceCode);
                 result.ChepinMetrics.InputVariables = variables.Count(v => v.Value == "P");
@@ -198,7 +208,7 @@ namespace CodeAnalyzer.Analyzers
 
                 result.GilbMetrics.CodeQuality = MetricsCalculator.CalculateGilbCodeQuality(
                     result.GilbMetrics.MaintainabilityIndex,
-                    CalculateCyclomaticComplexity(sourceCode)
+                    CalculateCyclomaticComplexity(sourceCode) // Возможно, здесь нужно использовать абсолютную сложность CL, если это соответствует примеру
                 );
 
                 // Добавление предупреждений
@@ -433,6 +443,16 @@ namespace CodeAnalyzer.Analyzers
         public List<AnalysisResult> GetAnalysisResults()
         {
             return new List<AnalysisResult>();
+        }
+
+        // Метод для подсчета условных операторов
+        private int CountConditionalOperators(string sourceCode)
+        {
+            // Подсчет условных операторов (те же, что для цикломатической сложности, но без базовой единицы)
+            var count = Regex.Matches(sourceCode, @"\bif\b|\belse\b|\bswitch\b|\bcase\b|\bdefault\b|\bfor\b|\bwhile\b|\bdo\b|\bforeach").Count;
+             count += Regex.Matches(sourceCode, @"\?").Count; // Тернарный оператор
+             count += Regex.Matches(sourceCode, @"\bcatch\b").Count; // catch блок
+            return count;
         }
     }
 } 

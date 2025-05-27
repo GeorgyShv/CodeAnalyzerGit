@@ -25,6 +25,10 @@ namespace CodeAnalyzer.Models
         // Дополнительные параметры для метрик Холстеда
         public int NumberOfInputOutputParameters { get; set; } // n2*
 
+        // Дополнительные метрики сложности из примера
+        public int AbsoluteComplexityCL { get; set; } // CL
+        public double RelativeComplexityCL { get; set; } // cl
+
         // Предупреждения
         public List<string> Warnings { get; set; } = new();
     }
