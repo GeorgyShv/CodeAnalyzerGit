@@ -226,6 +226,19 @@ namespace CodeAnalyzer.Analyzers
         {
             var variables = new Dictionary<string, string>();
             
+            // Добавляем системные типы и using директивы
+            var systemTypes = new HashSet<string> { "System", "Console", "String", "Int32", "Double", "Boolean", "DateTime", "List", "Dictionary", "Array" };
+            var usingDirectives = new HashSet<string>();
+            
+            // Находим все using директивы
+            var usingMatches = Regex.Matches(sourceCode, @"using\s+([^;]+);");
+            foreach (Match match in usingMatches)
+            {
+                var usingDirective = match.Groups[1].Value.Trim();
+                usingDirectives.Add(usingDirective);
+                variables[usingDirective] = "P"; // Using директивы считаются входными переменными
+            }
+
             // Находим все переменные и типы
             var variablePattern = @"\b([a-zA-Z_][a-zA-Z0-9_]*)\b";
             var matches = Regex.Matches(sourceCode, variablePattern);
@@ -235,7 +248,14 @@ namespace CodeAnalyzer.Analyzers
                 var varName = match.Value;
                 if (!variables.ContainsKey(varName))
                 {
-                    // Пересматриваем логику определения типа переменной согласно примеру
+                    // Проверяем, является ли переменная системным типом
+                    if (systemTypes.Contains(varName))
+                    {
+                        variables[varName] = "P"; // Системные типы считаются входными переменными
+                        continue;
+                    }
+
+                    // Определяем тип переменной
                     if (IsControlVariable(varName, sourceCode))
                         variables[varName] = "C";
                     else if (IsInputVariable(varName, sourceCode))
@@ -243,7 +263,7 @@ namespace CodeAnalyzer.Analyzers
                     else if (IsModifiedVariable(varName, sourceCode))
                         variables[varName] = "M";
                     else
-                        variables[varName] = "T"; // Неиспользуемые переменные (или не классифицированные)
+                        variables[varName] = "T";
                 }
             }
 
@@ -252,7 +272,6 @@ namespace CodeAnalyzer.Analyzers
 
         private bool IsControlVariable(string varName, string sourceCode)
         {
-            // Паттерны для переменных, непосредственно управляющих потоком выполнения (условия циклов, ветвлений)
             var controlPatterns = new[]
             {
                 $@"\bfor\s*\(\s*{varName}\s*[=<>!]",
@@ -264,25 +283,11 @@ namespace CodeAnalyzer.Analyzers
                 $@"\b{varName}\s*\?\s*[^:]*\s*:"
             };
 
-            // Исключаем простые инкременты/декременты, которые чаще являются M, если не используются в условии
-            // (это сложно сделать точно только через regex, но попробуем исключить явные счетчики циклов)
-            var exclusionPatterns = new[]
-            {
-                $@"\b{varName}\s*\+\+;",
-                $@"\b{varName}\s*--;",
-                $@"\b{varName}\s*=\s*{varName}\s*[+\-*\/%]" // Простые модификации, могут быть M
-            };
-
-            var isControl = controlPatterns.Any(pattern => Regex.IsMatch(sourceCode, pattern));
-            var isExcluded = exclusionPatterns.Any(pattern => Regex.IsMatch(sourceCode, pattern));
-
-            // Классифицируем как C, только если соответствует управляющему паттерну и не соответствует исключающему (упрощенно)
-            return isControl && !isExcluded;
+            return controlPatterns.Any(pattern => Regex.IsMatch(sourceCode, pattern));
         }
 
         private bool IsInputVariable(string varName, string sourceCode)
         {
-            // Паттерны для переменных, используемых для расчетов, обеспечения вывода или как контейнеры для входных данных
             var inputPatterns = new[]
             {
                 $@"\b{varName}\s*=\s*Console\.Read",
@@ -305,7 +310,6 @@ namespace CodeAnalyzer.Analyzers
 
         private bool IsModifiedVariable(string varName, string sourceCode)
         {
-            // Паттерны для переменных, которые изменяются в результате операций или присваиваний
             var modificationPatterns = new[]
             {
                 $@"\b{varName}\s*\+=",
@@ -327,14 +331,7 @@ namespace CodeAnalyzer.Analyzers
                 @"\b" + varName + @"\s*=\s*\{"
             };
 
-            // Проверяем, является ли переменная модифицируемой
-            var isModified = modificationPatterns.Any(pattern => Regex.IsMatch(sourceCode, pattern));
-
-            // Убеждаемся, что переменная не была классифицирована как C или P (избегаем двойной классификации)
-            // Эта проверка должна быть во внешней логике AnalyzeVariables, но можно добавить и здесь как дополнительный фильтр
-            // (хотя это не идеально, так как regex может не охватить все случаи P и C)
-            // Для простоты текущей реализации, оставим основную логику классификации в AnalyzeVariables
-            return isModified;
+            return modificationPatterns.Any(pattern => Regex.IsMatch(sourceCode, pattern));
         }
 
         private int CalculateCyclomaticComplexity(string sourceCode)
