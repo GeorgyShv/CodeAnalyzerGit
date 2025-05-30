@@ -18,7 +18,6 @@ namespace CodeAnalyzer.Models
 
         // Метрики в структурированном виде
         public HalsteadMetrics HalsteadMetrics { get; set; } = new();
-        public McCabeMetrics McCabeMetrics { get; set; } = new();
         public GilbMetrics GilbMetrics { get; set; } = new();
         public ChepinMetrics ChepinMetrics { get; set; } = new();
 
@@ -54,13 +53,6 @@ namespace CodeAnalyzer.Models
         public double ProgramLevel { get; set; } // L
         public double LanguageLevel { get; set; } // lambda
         public double ProgrammingEffort { get; set; } // E
-    }
-
-    public class McCabeMetrics
-    {
-        public int CyclomaticComplexity { get; set; }
-        public int EssentialComplexity { get; set; }
-        public int DesignComplexity { get; set; }
     }
 
     public class GilbMetrics

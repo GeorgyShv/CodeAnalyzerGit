@@ -1,6 +1,9 @@
 using CodeAnalyzer.Core;
 using CodeAnalyzer.Analyzers;
 using CodeAnalyzer.Services;
+using QuestPDF.Infrastructure;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +25,8 @@ builder.Services.AddScoped<ICodeAnalyzer, CSharpAnalyzer>();
 builder.Services.AddScoped<ICodeAnalyzer, CppAnalyzer>();
 builder.Services.AddScoped<ICodeAnalyzer, JavaAnalyzer>();
 builder.Services.AddScoped<MetricsVisualizationService>();
+builder.Services.AddScoped<IPdfReportService, PdfReportService>();
+builder.Services.AddScoped<IChartImageService, ChartImageService>();
 
 var app = builder.Build();
 
