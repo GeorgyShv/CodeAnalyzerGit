@@ -42,6 +42,9 @@ else if (Model.Result != null)
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Результаты анализа</h5>
                     <div>
+                        <a href="/api/report/pdf" class="btn btn-primary btn-sm me-2" target="_blank">
+                            <i class="bi bi-file-pdf me-2"></i>Напечатать отчет
+                        </a>
                         <a href="/Visualization" class="btn btn-primary btn-sm me-2">
                             <i class="bi bi-graph-up me-2"></i>Визуализация
                         </a>
@@ -110,88 +113,184 @@ else if (Model.Result != null)
                             </ul>
                         </div>
                     }
-                </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Метрики Холстеда</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-6 mb-3">
-                                    <h6 class="text-muted mb-2">Объем</h6>
-                                    <p class="mb-0">@Model.Result.HalsteadMetrics.Volume.ToString("F2")</p>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <h6 class="text-muted mb-2">Сложность</h6>
-                                    <p class="mb-0">@Model.Result.HalsteadMetrics.Difficulty.ToString("F2")</p>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <h6 class="text-muted mb-2">Усилия</h6>
-                                    <p class="mb-0">@Model.Result.HalsteadMetrics.Effort.ToString("F2")</p>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <h6 class="text-muted mb-2">Время</h6>
-                                    <p class="mb-0">@Model.Result.HalsteadMetrics.Time.ToString("F2")</p>
-                                </div>
-                                <div class="col-6">
-                                    <h6 class="text-muted mb-2">Ошибки</h6>
-                                    <p class="mb-0">@Model.Result.HalsteadMetrics.Bugs.ToString("F2")</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Метрики Чепина</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-6 mb-3">
-                                    <h6 class="text-muted mb-2">Входные переменные</h6>
-                                    <p class="mb-0">@Model.Result.ChepinMetrics.InputVariables</p>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <h6 class="text-muted mb-2">Модифицируемые</h6>
-                                    <p class="mb-0">@Model.Result.ChepinMetrics.ModifiedVariables</p>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <h6 class="text-muted mb-2">Управляющие</h6>
-                                    <p class="mb-0">@Model.Result.ChepinMetrics.ControlVariables</p>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <h6 class="text-muted mb-2">Неиспользуемые</h6>
-                                    <p class="mb-0">@Model.Result.ChepinMetrics.UnusedVariables</p>
-                                </div>
-                                <div class="col-12">
-                                    <h6 class="text-muted mb-2">Сложность</h6>
-                                    <p class="mb-0">@Model.Result.ChepinMetrics.Complexity.ToString("F2")</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Метрики Джилба</h5>
-                </div>
-                <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h6 class="text-muted mb-2">Индекс поддерживаемости</h6>
-                            <p class="mb-0">@Model.Result.GilbMetrics.MaintainabilityIndex.ToString("F2")</p>
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Метрики Холстеда</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Количество уникальных операторов и ключевых слов">
+                                                Уникальные операторы (n1)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.UniqueOperators</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Количество уникальных операндов (переменных, констант, литералов)">
+                                                Уникальные операнды (n2)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.UniqueOperands</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Общее количество всех операторов и ключевых слов">
+                                                Всего операторов (N1)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.TotalOperators</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Общее количество всех операндов">
+                                                Всего операндов (N2)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.TotalOperands</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Количество входных и выходных параметров программы (n2*)">
+                                                Вход/Выход параметры (n2*)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.NumberOfInputOutputParameters</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Общий размер словаря программы (n1 + n2)">
+                                                Словарь (n)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.Vocabulary.ToString("F0")</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Общая длина программы (N1 + N2)">
+                                                Длина (N)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.ProgramLength.ToString("F0")</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Объем программы в битах, мера информационного содержания">
+                                                Объем (V)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.Volume.ToString("F2")</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Минимально возможный теоретический объем программы">
+                                                Потенциальный объем (V*)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.PotentialVolume.ToString("F2")</p>
+                                        </div>
+                                         <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Сложность реализации программы">
+                                                Сложность (D)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.Difficulty.ToString("F2")</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Уровень, на котором программа написана, по отношению к потенциально возможному">
+                                                Уровень программы (L)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.ProgramLevel.ToString("F4")</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Уровень выразительности или мощности языка программирования">
+                                                Уровень языка (Lambda)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.LanguageLevel.ToString("F2")</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Усилия, необходимые для написания программы">
+                                                Усилия (E)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.Effort.ToString("F2")</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Оценка времени, необходимого для реализации программы (в секундах)">
+                                                Время (T)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.Time.ToString("F2")</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Оценка количества потенциальных ошибок в программе">
+                                                Ошибки (B)
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.HalsteadMetrics.Bugs.ToString("F2")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="col-md-6">
-                            <h6 class="text-muted mb-2">Качество кода</h6>
-                            <p class="mb-0">@Model.Result.GilbMetrics.CodeQuality.ToString("F2")</p>
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">Метрики Чепина</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Количество входных переменных (P)">
+                                                Входные переменные
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.ChepinMetrics.InputVariables</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Количество модифицируемых переменных (M)">
+                                                Модифицируемые
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.ChepinMetrics.ModifiedVariables</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Количество управляющих переменных (C)">
+                                                Управляющие
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.ChepinMetrics.ControlVariables</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Количество неиспользуемых переменных (T)">
+                                                Неиспользуемые
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.ChepinMetrics.UnusedVariables</p>
+                                        </div>
+                                        <div class="col-12">
+                                            <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Сложность программы по метрике Чепина">
+                                                Сложность
+                                            </h6>
+                                            <p class="mb-0">@Model.Result.ChepinMetrics.Complexity.ToString("F2")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Метрики Джилба</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Индекс, отражающий легкость сопровождения и модификации кода">
+                                        Индекс поддерживаемости
+                                    </h6>
+                                    <p class="mb-0">@Model.Result.GilbMetrics.MaintainabilityIndex.ToString("F2")</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Общая оценка качества кода на основе поддерживаемости и сложности">
+                                        Качество кода
+                                    </h6>
+                                    <p class="mb-0">@Model.Result.GilbMetrics.CodeQuality.ToString("F2")</p>
+                                </div>
+                                <div class="col-md-6 mt-3">
+                                    <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Абсолютная сложность программы (количество условных операторов)">
+                                        Абсолютная сложность (CL)
+                                    </h6>
+                                    <p class="mb-0">@Model.Result.AbsoluteComplexityCL</p>
+                                </div>
+                                <div class="col-md-6 mt-3">
+                                    <h6 class="text-muted mb-2" data-toggle="tooltip" data-placement="top" title="Относительная сложность программы (CL / Общее число операторов и операндов)">
+                                        Относительная сложность (cl)
+                                    </h6>
+                                    <p class="mb-0">@Model.Result.RelativeComplexityCL.ToString("F4")</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -214,6 +313,11 @@ else if (Model.Result != null)
                 buttonText.textContent = 'Показать код';
             }
         }
+
+        // Инициализация Bootstrap Tooltips
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
     </script>
 }
 

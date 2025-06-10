@@ -130,15 +130,20 @@ namespace CodeAnalyzer.Analyzers
                     operandFrequency[op]++;
                 }
 
-                // Заполняем метрики Холстеда
+                // Заполняем метрики Холстеда (первичные)
                 result.HalsteadMetrics.UniqueOperators = operators.Count;
                 result.HalsteadMetrics.UniqueOperands = operands.Count;
                 result.HalsteadMetrics.TotalOperators = operatorFrequency.Values.Sum();
                 result.HalsteadMetrics.TotalOperands = operandFrequency.Values.Sum();
                 result.HalsteadMetrics.OperatorFrequency = operatorFrequency;
                 result.HalsteadMetrics.OperandFrequency = operandFrequency;
+                result.HalsteadMetrics.ProgramLength = (double)(result.HalsteadMetrics.TotalOperators + result.HalsteadMetrics.TotalOperands); // Расчет длины программы (N)
+                result.HalsteadMetrics.Vocabulary = result.HalsteadMetrics.UniqueOperators + result.HalsteadMetrics.UniqueOperands; // Расчет словаря (n)
 
-                // Расчет метрик Холстеда
+                // Определение числа входных/выходных параметров (n2*)
+                result.NumberOfInputOutputParameters = AnalyzeInputOutputParameters(sourceCode);
+
+                // Расчет метрик Холстеда (с использованием n2*)
                 result.HalsteadMetrics.Volume = MetricsCalculator.CalculateHalsteadVolume(
                     result.HalsteadMetrics.UniqueOperators,
                     result.HalsteadMetrics.UniqueOperands
@@ -162,6 +167,20 @@ namespace CodeAnalyzer.Analyzers
 
                 result.HalsteadMetrics.Bugs = MetricsCalculator.CalculateHalsteadBugs(
                     result.HalsteadMetrics.Volume
+                );
+
+                // Расчет дополнительных метрик Холстеда
+                result.HalsteadMetrics.PotentialVolume = MetricsCalculator.CalculateHalsteadPotentialVolume(result.NumberOfInputOutputParameters);
+                result.HalsteadMetrics.ProgramLevel = MetricsCalculator.CalculateHalsteadLevel(result.HalsteadMetrics.Volume, result.HalsteadMetrics.PotentialVolume);
+                result.HalsteadMetrics.LanguageLevel = MetricsCalculator.CalculateHalsteadLanguageLevel(result.HalsteadMetrics.ProgramLevel, result.HalsteadMetrics.PotentialVolume);
+                result.HalsteadMetrics.ProgrammingEffort = MetricsCalculator.CalculateHalsteadProgrammingEffort(result.HalsteadMetrics.Volume, result.HalsteadMetrics.ProgramLevel);
+
+                // Расчет метрик сложности из примера (CL, cl)
+                var numberOfConditionalOperators = CountConditionalOperators(sourceCode);
+                result.AbsoluteComplexityCL = MetricsCalculator.CalculateAbsoluteComplexityCL(numberOfConditionalOperators);
+                result.RelativeComplexityCL = MetricsCalculator.CalculateRelativeComplexityCL(
+                    result.AbsoluteComplexityCL,
+                    result.HalsteadMetrics.ProgramLength // Общее число операторов и операндов (N1 + N2)
                 );
 
                 // Анализ переменных для метрики Чепина
@@ -189,7 +208,7 @@ namespace CodeAnalyzer.Analyzers
 
                 result.GilbMetrics.CodeQuality = MetricsCalculator.CalculateGilbCodeQuality(
                     result.GilbMetrics.MaintainabilityIndex,
-                    CalculateCyclomaticComplexity(sourceCode)
+                    CalculateCyclomaticComplexity(sourceCode) // Возможно, здесь нужно использовать абсолютную сложность CL, если это соответствует примеру
                 );
 
                 // Добавление предупреждений
@@ -335,6 +354,35 @@ namespace CodeAnalyzer.Analyzers
             }
         }
 
+        private int AnalyzeInputOutputParameters(string sourceCode)
+        {
+            var ioParameters = new HashSet<string>();
+
+            // Поиск переменных и литералов в Scanner и System.out вызовах
+            var ioMatches = Regex.Matches(sourceCode, @"(Scanner.*?next.*?\(\)|System\.out\.print(?:ln)?\(.*?\))");
+            foreach (Match ioMatch in ioMatches)
+            {
+                var content = ioMatch.Groups[1].Value;
+                // Ищем переменные и строковые/символьные литералы
+                 var parameterMatches = Regex.Matches(content, @"\b([a-zA-Z_][a-zA-Z0-9_]*)\b|""(.*?)""|'(.*?)'");
+                foreach (Match paramMatch in parameterMatches)
+                {
+                    if (paramMatch.Groups[1].Success) ioParameters.Add(paramMatch.Groups[1].Value); // Переменная
+                    if (paramMatch.Groups[2].Success) ioParameters.Add($"\"" + paramMatch.Groups[2].Value + "\""); // Строковый литерал
+                    if (paramMatch.Groups[3].Success) ioParameters.Add("'" + paramMatch.Groups[3].Value + "'"); // Символьный литерал
+                }
+            }
+
+            // Ищем переменные, которым присваивается результат чтения из Scanner
+            var scannerReadMatches = Regex.Matches(sourceCode, @"([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*new\s+Scanner.*?next.*?\(\)");
+            foreach (Match match in scannerReadMatches)
+            {
+                ioParameters.Add(match.Groups[1].Value);
+            }
+
+            return ioParameters.Count;
+        }
+
         public string[] GetSupportedExtensions()
         {
             return new[] { ".java" };
@@ -383,6 +431,18 @@ namespace CodeAnalyzer.Analyzers
         public List<AnalysisResult> GetAnalysisResults()
         {
             return new List<AnalysisResult>();
+        }
+
+        // Метод для подсчета условных операторов
+        private int CountConditionalOperators(string sourceCode)
+        {
+            // Подсчет условных операторов (те же, что для цикломатической сложности, но без базовой единицы)
+            var count = Regex.Matches(sourceCode, @"\bif\b|\belse\b|\bswitch\b|\bcase\b|\bdefault\b|\bfor\b|\bwhile\b|\bdo\b|\bforeach").Count;
+             count += Regex.Matches(sourceCode, @"\?").Count; // Тернарный оператор
+             count += Regex.Matches(sourceCode, @"\bcatch\b").Count; // catch блок
+             count += Regex.Matches(sourceCode, @"\b&&\b").Count; // Логическое И
+             count += Regex.Matches(sourceCode, @"\b\|\|\b").Count; // Логическое ИЛИ
+            return count;
         }
     }
 } 

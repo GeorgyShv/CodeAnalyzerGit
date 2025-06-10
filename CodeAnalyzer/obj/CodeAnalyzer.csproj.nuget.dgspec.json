@@ -48,6 +48,14 @@
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
               "target": "Package",
               "version": "[1.19.5, )"
+            },
+            "QuestPDF": {
+              "target": "Package",
+              "version": "[2023.12.6, )"
+            },
+            "ScottPlot": {
+              "target": "Package",
+              "version": "[4.1.68, )"
             }
           },
           "imports": [

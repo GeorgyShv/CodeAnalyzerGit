@@ -18,9 +18,15 @@ namespace CodeAnalyzer.Models
 
         // Метрики в структурированном виде
         public HalsteadMetrics HalsteadMetrics { get; set; } = new();
-        public McCabeMetrics McCabeMetrics { get; set; } = new();
         public GilbMetrics GilbMetrics { get; set; } = new();
         public ChepinMetrics ChepinMetrics { get; set; } = new();
+
+        // Дополнительные параметры для метрик Холстеда
+        public int NumberOfInputOutputParameters { get; set; } // n2*
+
+        // Дополнительные метрики сложности из примера
+        public int AbsoluteComplexityCL { get; set; } // CL
+        public double RelativeComplexityCL { get; set; } // cl
 
         // Предупреждения
         public List<string> Warnings { get; set; } = new();
@@ -41,13 +47,12 @@ namespace CodeAnalyzer.Models
         public double Bugs { get; set; }
         public Dictionary<string, int> OperatorFrequency { get; set; } = new();
         public Dictionary<string, int> OperandFrequency { get; set; } = new();
-    }
 
-    public class McCabeMetrics
-    {
-        public int CyclomaticComplexity { get; set; }
-        public int EssentialComplexity { get; set; }
-        public int DesignComplexity { get; set; }
+        // Дополнительные метрики Холстеда
+        public double PotentialVolume { get; set; } // V*
+        public double ProgramLevel { get; set; } // L
+        public double LanguageLevel { get; set; } // lambda
+        public double ProgrammingEffort { get; set; } // E
     }
 
     public class GilbMetrics
