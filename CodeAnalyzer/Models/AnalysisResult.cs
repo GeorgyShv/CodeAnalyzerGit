@@ -30,6 +30,7 @@ namespace CodeAnalyzer.Models
 
         // Предупреждения
         public List<string> Warnings { get; set; } = new();
+        public FuzzyQualityResult FuzzyQuality { get; set; } = new();
     }
 
     public class HalsteadMetrics
@@ -69,5 +70,14 @@ namespace CodeAnalyzer.Models
         public int UnusedVariables { get; set; }  // T
         public double Complexity { get; set; }  // Q
         public Dictionary<string, string> VariableTypes { get; set; } = new();  // Типы переменных
+    }
+
+    public class FuzzyQualityResult
+    {
+        public double Score { get; set; }
+        public string Level { get; set; } = string.Empty;
+        public Dictionary<string, double> InputMemberships { get; set; } = new();
+        public Dictionary<string, double> QualityMemberships { get; set; } = new();
+        public List<string> TriggeredRules { get; set; } = new();
     }
 } 

@@ -212,6 +212,7 @@ namespace CodeAnalyzer.Analyzers
                 );
 
                 // Добавление предупреждений
+                result.FuzzyQuality = FuzzyCodeQualityEvaluator.Evaluate(result);
                 AddWarnings(result);
 
                 return result;
@@ -351,6 +352,11 @@ namespace CodeAnalyzer.Analyzers
             if (result.GilbMetrics.CodeQuality < 0.5)
             {
                 result.Warnings.Add("Низкое качество кода по метрике Джилба");
+            }
+
+            if (!string.IsNullOrWhiteSpace(result.FuzzyQuality.Level) && result.FuzzyQuality.Score < 0.4)
+            {
+                result.Warnings.Add($"Нечеткая оценка качества кода: {result.FuzzyQuality.Level} ({result.FuzzyQuality.Score:P0})");
             }
         }
 

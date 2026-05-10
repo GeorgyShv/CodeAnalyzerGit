@@ -169,6 +169,57 @@ namespace CodeAnalyzer.Services
                 column.Item().PaddingBottom(10);
 
                 // Предупреждения
+                if (!string.IsNullOrWhiteSpace(result.FuzzyQuality.Level))
+                {
+                    column.Item().PaddingTop(10);
+                    column.Item().Text("Нечеткая оценка качества кода").FontSize(16).SemiBold().FontFamily("Arial");
+                    column.Item().Table(table =>
+                    {
+                        table.ColumnsDefinition(columns =>
+                        {
+                            columns.RelativeColumn();
+                            columns.RelativeColumn();
+                        });
+                        AddMetricRow(table, "Итоговая оценка", result.FuzzyQuality.Score.ToString("P0"));
+                        AddMetricRow(table, "Лингвистический уровень", result.FuzzyQuality.Level);
+                        AddMetricRow(table, "Активных правил", result.FuzzyQuality.TriggeredRules.Count.ToString());
+                    });
+
+                    if (result.FuzzyQuality.QualityMemberships.Any())
+                    {
+                        column.Item().PaddingTop(5);
+                        column.Item().Text("Степени принадлежности итоговой оценки").FontSize(12).SemiBold().FontFamily("Arial");
+                        column.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.RelativeColumn();
+                            });
+
+                            foreach (var term in result.FuzzyQuality.QualityMemberships.OrderByDescending(term => term.Value))
+                            {
+                                AddMetricRow(table, term.Key, term.Value.ToString("F2"));
+                            }
+                        });
+                    }
+
+                    if (result.FuzzyQuality.TriggeredRules.Any())
+                    {
+                        column.Item().PaddingTop(5);
+                        column.Item().Text("Сработавшие правила").FontSize(12).SemiBold().FontFamily("Arial");
+                        column.Item().Column(rulesColumn =>
+                        {
+                            foreach (var rule in result.FuzzyQuality.TriggeredRules.Take(5))
+                            {
+                                rulesColumn.Item().Text($"- {rule}").FontFamily("Arial");
+                            }
+                        });
+                    }
+
+                    column.Item().PaddingBottom(10);
+                }
+
                 if (result.Warnings.Any())
                 {
                     column.Item().PaddingTop(10);

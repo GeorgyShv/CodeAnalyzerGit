@@ -114,6 +114,70 @@ else if (Model.Result != null)
                         </div>
                     }
 
+                    @if (!string.IsNullOrWhiteSpace(Model.Result.FuzzyQuality.Level))
+                    {
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Нечеткая оценка качества кода</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <h6 class="text-muted mb-2">Итоговая оценка</h6>
+                                        <p class="mb-0">@Model.Result.FuzzyQuality.Score.ToString("P0")</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="text-muted mb-2">Лингвистический уровень</h6>
+                                        <p class="mb-0">@Model.Result.FuzzyQuality.Level</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="text-muted mb-2">Активных правил</h6>
+                                        <p class="mb-0">@Model.Result.FuzzyQuality.TriggeredRules.Count</p>
+                                    </div>
+                                </div>
+
+                                @if (Model.Result.FuzzyQuality.QualityMemberships.Any())
+                                {
+                                    <h6 class="text-muted mb-2">Степени принадлежности итоговой оценки</h6>
+                                    <div class="row mb-3">
+                                        @foreach (var term in Model.Result.FuzzyQuality.QualityMemberships.OrderByDescending(term => term.Value))
+                                        {
+                                            <div class="col-md-4 mb-2">
+                                                <span class="d-block">@term.Key</span>
+                                                <strong>@term.Value.ToString("F2")</strong>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+
+                                @if (Model.Result.FuzzyQuality.InputMemberships.Any(term => term.Value > 0))
+                                {
+                                    <h6 class="text-muted mb-2">Наиболее выраженные входные термы</h6>
+                                    <div class="row mb-3">
+                                        @foreach (var term in Model.Result.FuzzyQuality.InputMemberships.Where(term => term.Value > 0).OrderByDescending(term => term.Value).Take(6))
+                                        {
+                                            <div class="col-md-6 mb-2">
+                                                <span class="d-block">@term.Key</span>
+                                                <strong>@term.Value.ToString("F2")</strong>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+
+                                @if (Model.Result.FuzzyQuality.TriggeredRules.Any())
+                                {
+                                    <h6 class="text-muted mb-2">Сработавшие правила</h6>
+                                    <ul class="mb-0">
+                                        @foreach (var rule in Model.Result.FuzzyQuality.TriggeredRules.Take(5))
+                                        {
+                                            <li>@rule</li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+                    }
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="card mb-4">
